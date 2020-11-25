@@ -2,6 +2,7 @@
 
 /// COM link states. These constants encode the commands sent from the SoC to the EC.
 
+#[derive(Copy, Clone, Debug)]
 pub struct ComSpec {
     /// the "verb" specifying the command
     pub verb: u16,
@@ -46,6 +47,7 @@ impl ComState {
     pub const GG_FULL_CAPACITY: ComSpec      = ComSpec{verb: 0x7402, w_words: 0,     r_words: 1,     response: false};
 
     pub const STAT: ComSpec                  = ComSpec{verb: 0x8000, w_words: 0,     r_words: 16    ,response: false};
+    pub const STAT_RETURN: ComSpec           = ComSpec{verb: 0x8001, w_words: 0,     r_words: 0     ,response: true};
 
     pub const POWER_OFF: ComSpec             = ComSpec{verb: 0x9000, w_words: 0,     r_words: 1     ,response: false};
     pub const POWER_CHARGER_STATE: ComSpec   = ComSpec{verb: 0x9100, w_words: 0,     r_words: 1     ,response: false};
