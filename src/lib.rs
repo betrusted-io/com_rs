@@ -69,7 +69,7 @@ impl ComState {
     pub const GYRO_READ: ComSpec             = ComSpec{verb: 0xA100, w_words: 0,     r_words: 4     ,response: false};
 
     // USB CC commands
-    pub const POLL_USB_CC: ComSpec           = ComSpec{verb: 0xB000, w_words: 0,     r_words: 3     ,response: false};
+    pub const POLL_USB_CC: ComSpec           = ComSpec{verb: 0xB000, w_words: 0,     r_words: 4     ,response: false};
 
     // protocol overhead commands
     pub const LINK_READ: ComSpec             = ComSpec{verb: 0xF0F0, w_words: 0,     r_words: 0     ,response: false}; // dummy command to "pump" the bus to read data
