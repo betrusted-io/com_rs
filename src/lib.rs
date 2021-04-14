@@ -25,6 +25,8 @@ impl ComState {
     pub const WFX_RXSTAT_GET: ComSpec        = ComSpec{verb: 0x2201, w_words: 0,     r_words: 376/2 ,response: false};
     pub const WFX_FW_REV_GET: ComSpec        = ComSpec{verb: 0x2202, w_words: 0,     r_words: 3     ,response: false};
     pub const WF200_RESET: ComSpec           = ComSpec{verb: 0x2203, w_words: 1,     r_words: 0     ,response: false};
+    pub const SSID_SCAN_ON: ComSpec          = ComSpec{verb: 0x2204, w_words: 0,     r_words: 0     ,response: false};
+    pub const SSID_SCAN_OFF: ComSpec         = ComSpec{verb: 0x2205, w_words: 0,     r_words: 0     ,response: false};
 
     // flash commands
     pub const FLASH_WAITACK: ComSpec         = ComSpec{verb: 0x3000, w_words: 0,     r_words: 1     ,response: false};
