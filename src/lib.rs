@@ -24,6 +24,7 @@ impl ComState {
     pub const WFX_PDS_LINE_SET: ComSpec      = ComSpec{verb: 0x2200, w_words: 129,   r_words: 0     ,response: false}; // 1 length + 128 buffer. length is in *bytes* not words. Sends one line of a PDS.
     pub const WFX_RXSTAT_GET: ComSpec        = ComSpec{verb: 0x2201, w_words: 0,     r_words: 376/2 ,response: false};
     pub const WFX_FW_REV_GET: ComSpec        = ComSpec{verb: 0x2202, w_words: 0,     r_words: 3     ,response: false};
+    pub const WF200_RESET: ComSpec           = ComSpec{verb: 0x2203, w_words: 1,     r_words: 0     ,response: false};
 
     // flash commands
     pub const FLASH_WAITACK: ComSpec         = ComSpec{verb: 0x3000, w_words: 0,     r_words: 1     ,response: false};
