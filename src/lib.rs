@@ -1,5 +1,7 @@
 #![no_std]
 
+pub mod serdes;
+
 /// COM link states. These constants encode the commands sent from the SoC to the EC.
 
 #[derive(Copy, Clone, Debug)]
