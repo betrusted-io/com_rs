@@ -33,9 +33,9 @@ impl ComState {
     // WLAN_*
     // - SSID & PASS fields are sized to match requirements of the WF200 fullMAC driver API.
     //   See https://docs.silabs.com/wifi/wf200/rtos/latest/group-w-f-m-g-r-o-u-p-c-o-n-c-e-p-t-s
-    // - SSID:   1 byte length + 1 byte pad +  32 bytes data =  34 bytes --> rounds to 17 words
-    // - PASS:   1 byte length + 1 byte pad +  64 bytes data =  66 bytes --> rounds to 33 words
-    // - STATUS: 1 byte length + 1 byte pad + 160 bytes data = 162 bytes --> rounds to 81 words
+    // - SSID:   2 bytes length + 32 bytes data = 34 bytes --> 17 words
+    // - PASS:   2 bytes length + 64 bytes data = 66 bytes --> 33 words
+    // - STATUS: 2 bytes length + 64 bytes data = 66 bytes --> 33 words
     pub const WLAN_ON: ComSpec               = ComSpec{verb: 0x2300, w_words: 0,     r_words: 0     ,response: false};
     pub const WLAN_OFF: ComSpec              = ComSpec{verb: 0x2301, w_words: 0,     r_words: 0     ,response: false};
     pub const WLAN_SET_SSID: ComSpec         = ComSpec{verb: 0x2302, w_words: 17,    r_words: 0     ,response: false};

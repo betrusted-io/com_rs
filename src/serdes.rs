@@ -7,10 +7,8 @@
 // - u16_buf[1..N]: little-endian packed utf-8 string
 pub const STR_32_WORDS: usize = 17; // 1 length + 16 data (max utf-8 length 32 bytes)
 pub const STR_64_WORDS: usize = 33; // 1 length + 32 data (max utf-8 length 64 bytes)
-pub const STR_128_WORDS: usize = 65; // 1 length + 64 data (max utf-8 length 128 bytes)
 pub const STR_32_U8_SIZE: usize = 2 * (STR_32_WORDS - 1);
 pub const STR_64_U8_SIZE: usize = 2 * (STR_64_WORDS - 1);
-pub const STR_128_U8_SIZE: usize = 2 * (STR_128_WORDS - 1);
 
 /// Error codes related to COM bus protocol serialization/deserialization
 #[derive(Debug)]
