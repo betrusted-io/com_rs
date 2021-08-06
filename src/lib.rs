@@ -42,7 +42,7 @@ impl ComState {
     pub const WLAN_SET_PASS: ComSpec         = ComSpec{verb: 0x2303, w_words: 33,    r_words: 0     ,response: false};
     pub const WLAN_JOIN: ComSpec             = ComSpec{verb: 0x2304, w_words: 0,     r_words: 0     ,response: false};
     pub const WLAN_LEAVE: ComSpec            = ComSpec{verb: 0x2305, w_words: 0,     r_words: 0     ,response: false};
-    pub const WLAN_STATUS: ComSpec           = ComSpec{verb: 0x2306, w_words: 0,     r_words: 81    ,response: false};
+    pub const WLAN_STATUS: ComSpec           = ComSpec{verb: 0x2306, w_words: 0,     r_words: 33    ,response: false};
 
     // flash commands
     pub const FLASH_WAITACK: ComSpec         = ComSpec{verb: 0x3000, w_words: 0,     r_words: 1     ,response: false};
