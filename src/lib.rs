@@ -1,5 +1,7 @@
 #![no_std]
 
+pub mod serdes;
+
 /// COM link states. These constants encode the commands sent from the SoC to the EC.
 
 #[derive(Copy, Clone, Debug)]
@@ -27,6 +29,20 @@ impl ComState {
     pub const WF200_RESET: ComSpec           = ComSpec{verb: 0x2203, w_words: 1,     r_words: 0     ,response: false};
     pub const SSID_SCAN_ON: ComSpec          = ComSpec{verb: 0x2204, w_words: 0,     r_words: 0     ,response: false};
     pub const SSID_SCAN_OFF: ComSpec         = ComSpec{verb: 0x2205, w_words: 0,     r_words: 0     ,response: false};
+
+    // WLAN_*
+    // - SSID & PASS fields are sized to match requirements of the WF200 fullMAC driver API.
+    //   See https://docs.silabs.com/wifi/wf200/rtos/latest/group-w-f-m-g-r-o-u-p-c-o-n-c-e-p-t-s
+    // - SSID:   2 bytes length + 32 bytes data = 34 bytes --> 17 words
+    // - PASS:   2 bytes length + 64 bytes data = 66 bytes --> 33 words
+    // - STATUS: 2 bytes length + 64 bytes data = 66 bytes --> 33 words
+    pub const WLAN_ON: ComSpec               = ComSpec{verb: 0x2300, w_words: 0,     r_words: 0     ,response: false};
+    pub const WLAN_OFF: ComSpec              = ComSpec{verb: 0x2301, w_words: 0,     r_words: 0     ,response: false};
+    pub const WLAN_SET_SSID: ComSpec         = ComSpec{verb: 0x2302, w_words: 17,    r_words: 0     ,response: false};
+    pub const WLAN_SET_PASS: ComSpec         = ComSpec{verb: 0x2303, w_words: 33,    r_words: 0     ,response: false};
+    pub const WLAN_JOIN: ComSpec             = ComSpec{verb: 0x2304, w_words: 0,     r_words: 0     ,response: false};
+    pub const WLAN_LEAVE: ComSpec            = ComSpec{verb: 0x2305, w_words: 0,     r_words: 0     ,response: false};
+    pub const WLAN_STATUS: ComSpec           = ComSpec{verb: 0x2306, w_words: 0,     r_words: 33    ,response: false};
 
     // flash commands
     pub const FLASH_WAITACK: ComSpec         = ComSpec{verb: 0x3000, w_words: 0,     r_words: 1     ,response: false};
