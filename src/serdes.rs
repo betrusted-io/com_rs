@@ -1,5 +1,7 @@
 #![forbid(unsafe_code)]
 
+use crate::ComState;
+
 // These constants help with sending and receiving utf-8 string slices serialized as [u16]
 // across the COM bus for COM verbs that take string arguments.
 // Serialized [u16] buffer format is:
@@ -113,6 +115,110 @@ impl<const U16_LEN: usize, const U8_LEN: usize> StringDes<U16_LEN, U8_LEN> {
         match core::str::from_utf8(&self.u8_buf[..str_len]) {
             Ok(s) => Ok(s),
             _ => Err(SerdesError::Utf8Decode),
+        }
+    }
+}
+
+/// Publicly shared Dhcp state vector. This vector can be serialized between the EC and the SOC.
+/// Initially it corresponds 1:1 with the DHCP internal state machine, but it's a separate data structure
+/// so that the DHCP implementation can drift without requiring modification to the COM interface.
+#[derive(Clone, Copy)]
+#[repr(u16)]
+pub enum DhcpState {
+    Halted = 0,
+    Init = 1,
+    Selecting = 2,
+    Requesting = 3,
+    Bound = 4,
+    Renewing = 5,
+    Rebinding = 6,
+    Invalid = 7,
+}
+
+pub struct Ipv4Conf {
+    pub dhcp: DhcpState,
+    pub mac: [u8; 6],
+    pub addr: [u8; 4],
+    pub gtwy: [u8; 4],
+    pub mask: [u8; 4],
+    pub dns1: [u8; 4],
+    pub dns2: [u8; 4],
+}
+impl Ipv4Conf {
+    pub fn encode_u16(&self) -> [u16; ComState::WLAN_GET_IPV4_CONF.r_words as usize] {
+        let mut ret: [u16; ComState::WLAN_GET_IPV4_CONF.r_words as usize] = [0; ComState::WLAN_GET_IPV4_CONF.r_words as usize];
+        ret[0] = self.dhcp as u16;
+        ret[1] = self.mac[0] as u16 | (self.mac[1] as u16) << 8;
+        ret[2] = self.mac[2] as u16 | (self.mac[3] as u16) << 8;
+        ret[3] = self.mac[4] as u16 | (self.mac[5] as u16) << 8;
+
+        ret[4] = self.addr[0] as u16 | (self.addr[1] as u16) << 8;
+        ret[5] = self.addr[2] as u16 | (self.addr[3] as u16) << 8;
+
+        ret[6] = self.gtwy[0] as u16 | (self.gtwy[1] as u16) << 8;
+        ret[7] = self.gtwy[2] as u16 | (self.gtwy[3] as u16) << 8;
+
+        ret[8] = self.mask[0] as u16 | (self.mask[1] as u16) << 8;
+        ret[9] = self.mask[2] as u16 | (self.mask[3] as u16) << 8;
+
+        ret[10] = self.dns1[0] as u16 | (self.dns1[1] as u16) << 8;
+        ret[11] = self.dns1[2] as u16 | (self.dns1[3] as u16) << 8;
+        ret[12] = self.dns2[0] as u16 | (self.dns2[1] as u16) << 8;
+        ret[13] = self.dns2[2] as u16 | (self.dns2[3] as u16) << 8;
+
+        ret
+    }
+    pub fn decode_u16(data: &[u16; ComState::WLAN_GET_IPV4_CONF.r_words as usize]) -> Self {
+        let dhcp = match data[0] {
+            0 => DhcpState::Halted,
+            1 => DhcpState::Init,
+            2 => DhcpState::Selecting,
+            3 => DhcpState::Requesting,
+            4 => DhcpState::Bound,
+            5 => DhcpState::Renewing,
+            6 => DhcpState::Rebinding,
+            _ => DhcpState::Invalid,
+        };
+        Ipv4Conf {
+            dhcp,
+            mac: [
+                data[1] as u8,
+                (data[1] >> 8) as u8,
+                data[2] as u8,
+                (data[2] >> 8) as u8,
+                data[3] as u8,
+                (data[3] >> 8) as u8,
+            ],
+            addr: [
+                data[4] as u8,
+                (data[4] >> 8) as u8,
+                data[5] as u8,
+                (data[5] >> 8) as u8,
+            ],
+            gtwy: [
+                data[6] as u8,
+                (data[6] >> 8) as u8,
+                data[7] as u8,
+                (data[7] >> 8) as u8,
+            ],
+            mask: [
+                data[8] as u8,
+                (data[8] >> 8) as u8,
+                data[9] as u8,
+                (data[9] >> 8) as u8,
+            ],
+            dns1: [
+                data[10] as u8,
+                (data[10] >> 8) as u8,
+                data[11] as u8,
+                (data[11] >> 8) as u8,
+            ],
+            dns2: [
+                data[12] as u8,
+                (data[12] >> 8) as u8,
+                data[13] as u8,
+                (data[13] >> 8) as u8,
+            ],
         }
     }
 }
