@@ -221,6 +221,17 @@ impl Ipv4Conf {
             ],
         }
     }
+    pub fn default() -> Ipv4Conf {
+        Ipv4Conf {
+            dhcp: DhcpState::Halted,
+            mac: [0; 6],
+            addr: [0; 4],
+            gtwy: [0; 4],
+            mask: [0; 4],
+            dns1: [0; 4],
+            dns2: [0; 4]
+        }
+    }
 }
 
 /// Serdes Unit Tests.
