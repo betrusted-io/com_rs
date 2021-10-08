@@ -37,11 +37,6 @@ impl ComState {
     // - PASS:   2 bytes length + 64 bytes data = 66 bytes --> 33 words
     // - STATUS: 2 bytes length + 64 bytes data = 66 bytes --> 33 words
     // - IPV4_CONF: serialized binary data according to serdes::Ipv4Conf -> 14 words
-    // - GET_INTERRUPT: 1 word interrupt source, 1 word rx len argument (always returned) -> 2 words
-    // - SET_INTMASK: 1 word bitmask for interrupt source. Initially 0.
-    // - GET_INTMASK: 1 read word for the current interrupt bitmask
-    // - ACK_INTERRUPT: 1 word for acknowledging interrupts. All bits set in the ACK will set the GET_INTERRUPT bit to 0.
-    //   note that also calling a verb that handles an interrupt will implicitly acknowledge and clear the interrupt source
     pub const WLAN_ON: ComSpec               = ComSpec{verb: 0x2300, w_words: 0,     r_words: 0     ,response: false};
     pub const WLAN_OFF: ComSpec              = ComSpec{verb: 0x2301, w_words: 0,     r_words: 0     ,response: false};
     pub const WLAN_SET_SSID: ComSpec         = ComSpec{verb: 0x2302, w_words: 17,    r_words: 0     ,response: false};
@@ -50,10 +45,6 @@ impl ComState {
     pub const WLAN_LEAVE: ComSpec            = ComSpec{verb: 0x2305, w_words: 0,     r_words: 0     ,response: false};
     pub const WLAN_STATUS: ComSpec           = ComSpec{verb: 0x2306, w_words: 0,     r_words: 33    ,response: false};
     pub const WLAN_GET_IPV4_CONF: ComSpec    = ComSpec{verb: 0x2307, w_words: 0,     r_words: 14    ,response: false};
-    pub const WLAN_GET_INTERRUPT: ComSpec    = ComSpec{verb: 0x2308, w_words: 0,     r_words: 2     ,response: false};
-    pub const WLAN_SET_INTMASK: ComSpec      = ComSpec{verb: 0x2309, w_words: 1,     r_words: 0     ,response: false};
-    pub const WLAN_GET_INTMASK: ComSpec      = ComSpec{verb: 0x230A, w_words: 0,     r_words: 1     ,response: false};
-    pub const WLAN_ACK_INTERRUPT: ComSpec    = ComSpec{verb: 0x230B, w_words: 1,     r_words: 0     ,response: false};
 
     // flash commands
     pub const FLASH_WAITACK: ComSpec         = ComSpec{verb: 0x3000, w_words: 0,     r_words: 1     ,response: false};
@@ -104,7 +95,8 @@ impl ComState {
     pub const POLL_USB_CC: ComSpec           = ComSpec{verb: 0xB000, w_words: 0,     r_words: 5     ,response: false};
 
     // encoded length WLAN frames
-    // LSB mask of 0x7FF encodes number of to fetch or send
+    // LSB mask of 0x7FF encodes number of *words* to fetch or send; so, the interrupt handler must take
+    // the number of bytes to receive, divide by two and round-up to correctly derive the number of words
     // note: entries are not comprehensively encoded, just a few examples provided
     // The first word of a "FETCH" frame confirms the number of words to be sent. It should be equal to the LSB of the verb minus 1.
     // "SEND" frames do not encode a confirmation of words to send
@@ -117,8 +109,17 @@ impl ComState {
     pub const NET_FRAME_SEND_7FF: ComSpec    = ComSpec{verb: 0xC7FF, w_words: 0x7FF, r_words: 0     ,response: false};
 
     // protocol overhead commands
+    // - GET_INTERRUPT: 1 word interrupt source, 1 word rx len argument *in bytes* (always returned) -> 2 words
+    // - SET_INTMASK: 1 word bitmask for interrupt source. Initially 0.
+    // - GET_INTMASK: 1 read word for the current interrupt bitmask
+    // - ACK_INTERRUPT: 1 word for acknowledging interrupts. All bits set in the ACK will set the GET_INTERRUPT bit to 0.
+    //   note that also calling a verb that handles an interrupt will implicitly acknowledge and clear the interrupt source
     pub const LINK_READ: ComSpec             = ComSpec{verb: 0xF0F0, w_words: 0,     r_words: 0     ,response: false}; // dummy command to "pump" the bus to read data
     pub const LINK_SYNC: ComSpec             = ComSpec{verb: 0xFFFF, w_words: 0,     r_words: 0     ,response: false};
+    pub const LINK_GET_INTERRUPT: ComSpec    = ComSpec{verb: 0xF108, w_words: 0,     r_words: 2     ,response: false};
+    pub const LINK_SET_INTMASK: ComSpec      = ComSpec{verb: 0xF109, w_words: 1,     r_words: 0     ,response: false};
+    pub const LINK_GET_INTMASK: ComSpec      = ComSpec{verb: 0xF10A, w_words: 0,     r_words: 1     ,response: false};
+    pub const LINK_ACK_INTERRUPT: ComSpec    = ComSpec{verb: 0xF10B, w_words: 1,     r_words: 0     ,response: false};
 
     // catch-all error code
     pub const ERROR: ComSpec                 = ComSpec{verb: 0xDEAD, w_words: 0,     r_words: 0     ,response: true};
