@@ -122,7 +122,7 @@ impl<const U16_LEN: usize, const U8_LEN: usize> StringDes<U16_LEN, U8_LEN> {
 /// Publicly shared Dhcp state vector. This vector can be serialized between the EC and the SOC.
 /// Initially it corresponds 1:1 with the DHCP internal state machine, but it's a separate data structure
 /// so that the DHCP implementation can drift without requiring modification to the COM interface.
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 #[repr(u16)]
 pub enum DhcpState {
     Halted = 0,
@@ -135,6 +135,7 @@ pub enum DhcpState {
     Invalid = 7,
 }
 
+#[derive(Debug, Copy, Clone)]
 pub struct Ipv4Conf {
     pub dhcp: DhcpState,
     pub mac: [u8; 6],
