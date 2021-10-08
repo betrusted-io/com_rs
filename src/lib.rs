@@ -135,3 +135,5 @@ pub const INT_WLAN_IPCONF_UPDATE: u16 = 0b0000_0000_0000_0010;
 pub const INT_WLAN_SSID_UPDATE: u16   = 0b0000_0000_0000_0100;
 // set when battery is critical and system is about to shut down
 pub const INT_BATTERY_CRITICAL: u16   = 0b0000_0000_0000_1000;
+// reserve one code for internal error handling
+pub const INT_INVALID: u16            = 0b1000_0000_0000_0000;
