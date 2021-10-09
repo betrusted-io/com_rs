@@ -45,6 +45,7 @@ impl ComState {
     pub const WLAN_LEAVE: ComSpec            = ComSpec{verb: 0x2305, w_words: 0,     r_words: 0     ,response: false};
     pub const WLAN_STATUS: ComSpec           = ComSpec{verb: 0x2306, w_words: 0,     r_words: 33    ,response: false};
     pub const WLAN_GET_IPV4_CONF: ComSpec    = ComSpec{verb: 0x2307, w_words: 0,     r_words: 14    ,response: false};
+    pub const WLAN_GET_ERRCOUNTS: ComSpec    = ComSpec{verb: 0x2308, w_words: 0,     r_words: 4     ,response: false};
 
     // flash commands
     pub const FLASH_WAITACK: ComSpec         = ComSpec{verb: 0x3000, w_words: 0,     r_words: 1     ,response: false};
@@ -95,8 +96,8 @@ impl ComState {
     pub const POLL_USB_CC: ComSpec           = ComSpec{verb: 0xB000, w_words: 0,     r_words: 5     ,response: false};
 
     // encoded length WLAN frames
-    // LSB mask of 0x7FF encodes number of *words* to fetch or send; so, the interrupt handler must take
-    // the number of bytes to receive, divide by two and round-up to correctly derive the number of words
+    // LSB mask of 0x7FF encodes number of *bytes* to fetch or send; in the case that an odd number of bytes are
+    // required, the last byte is 0-padded. All data is packed in MSB order.
     // note: entries are not comprehensively encoded, just a few examples provided
     // The first word of a "FETCH" frame confirms the number of words to be sent. It should be equal to the LSB of the verb minus 1.
     // "SEND" frames do not encode a confirmation of words to send
@@ -135,5 +136,9 @@ pub const INT_WLAN_IPCONF_UPDATE: u16 = 0b0000_0000_0000_0010;
 pub const INT_WLAN_SSID_UPDATE: u16   = 0b0000_0000_0000_0100;
 // set when battery is critical and system is about to shut down
 pub const INT_BATTERY_CRITICAL: u16   = 0b0000_0000_0000_1000;
+// set if there's an error transmitting a packet
+pub const INT_WLAN_TX_ERROR: u16      = 0b0000_0000_0001_0000;
+// set if there's an error receiving a packet
+pub const INT_WLAN_RX_ERROR: u16      = 0b0000_0000_0010_0000;
 // reserve one code for internal error handling
 pub const INT_INVALID: u16            = 0b1000_0000_0000_0000;
