@@ -48,8 +48,8 @@ impl ComState {
     pub const WLAN_GET_IPV4_CONF: ComSpec    = ComSpec{verb: 0x2307, w_words: 0,     r_words: 14    ,response: false};
     pub const WLAN_GET_ERRCOUNTS: ComSpec    = ComSpec{verb: 0x2308, w_words: 0,     r_words: 4     ,response: false};
     // binary status reports the following:
-    // rssi(1), interface_status(1), dhcp_state(1), ipv4_address(14), ssid(17)
-    pub const WLAN_BIN_STATUS: ComSpec       = ComSpec{verb: 0x2309, w_words: 0,     r_words: 3+14+17 ,response: false};
+    // rssi(1), interface_status(1), ipv4_state(14), ssid(17)
+    pub const WLAN_BIN_STATUS: ComSpec       = ComSpec{verb: 0x2309, w_words: 0,     r_words: 2+14+17 ,response: false};
 
     // flash commands
     pub const FLASH_WAITACK: ComSpec         = ComSpec{verb: 0x3000, w_words: 0,     r_words: 1     ,response: false};
@@ -149,7 +149,7 @@ pub const INT_WLAN_RX_ERROR: u16      = 0b0000_0000_0010_0000;
 pub const INT_INVALID: u16            = 0b1000_0000_0000_0000;
 
 /// Possible link layer connection states
-#[derive(Copy, Clone, PartialEq, Debug)]
+#[derive(Copy, Clone, PartialEq, Eq, Debug)]
 #[repr(u16)]
 pub enum LinkState {
     Unknown = 0,
@@ -161,14 +161,28 @@ pub enum LinkState {
     Connected = 6,
     WFXError = 7,
 }
-
+impl LinkState {
+    pub fn decode_u16(state: u16) -> Self {
+        match state {
+            0 => LinkState::Unknown,
+            1 => LinkState::ResetHold,
+            2 => LinkState::Uninitialized,
+            3 => LinkState::Initializing,
+            4 => LinkState::Disconnected,
+            5 => LinkState::Connecting,
+            6 => LinkState::Connected,
+            7 => LinkState::WFXError,
+            _ => LinkState::Unknown,
+        }
+    }
+}
 
 /// DHCP Client States
 ///
 /// Note that InitReboot and Rebooting were intentionally omitted. Also, Halted is for
 /// power-up or receiving a DHCPNAK while in Renewing or Rebinding.
 ///
-#[derive(Copy, Clone, PartialEq, Debug)]
+#[derive(Copy, Clone, PartialEq, Eq, Debug)]
 #[repr(u16)]
 pub enum DhcpState {
     Halted = 0,
