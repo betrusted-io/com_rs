@@ -1,6 +1,6 @@
 #![forbid(unsafe_code)]
 
-use crate::ComState;
+use crate::{ComState, DhcpState};
 
 // These constants help with sending and receiving utf-8 string slices serialized as [u16]
 // across the COM bus for COM verbs that take string arguments.
@@ -117,22 +117,6 @@ impl<const U16_LEN: usize, const U8_LEN: usize> StringDes<U16_LEN, U8_LEN> {
             _ => Err(SerdesError::Utf8Decode),
         }
     }
-}
-
-/// Publicly shared Dhcp state vector. This vector can be serialized between the EC and the SOC.
-/// Initially it corresponds 1:1 with the DHCP internal state machine, but it's a separate data structure
-/// so that the DHCP implementation can drift without requiring modification to the COM interface.
-#[derive(Debug, Clone, Copy)]
-#[repr(u16)]
-pub enum DhcpState {
-    Halted = 0,
-    Init = 1,
-    Selecting = 2,
-    Requesting = 3,
-    Bound = 4,
-    Renewing = 5,
-    Rebinding = 6,
-    Invalid = 7,
 }
 
 #[derive(Debug, Copy, Clone)]

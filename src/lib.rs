@@ -47,6 +47,9 @@ impl ComState {
     pub const WLAN_STATUS: ComSpec           = ComSpec{verb: 0x2306, w_words: 0,     r_words: 33    ,response: false};
     pub const WLAN_GET_IPV4_CONF: ComSpec    = ComSpec{verb: 0x2307, w_words: 0,     r_words: 14    ,response: false};
     pub const WLAN_GET_ERRCOUNTS: ComSpec    = ComSpec{verb: 0x2308, w_words: 0,     r_words: 4     ,response: false};
+    // binary status reports the following:
+    // rssi interface_status dhcp_state ipv4_address ssid
+    pub const WLAN_BIN_STATUS: ComSpec       = ComSpec{verb: 0x2309, w_words: 0,     r_words: 4     ,response: false};
 
     // flash commands
     pub const FLASH_WAITACK: ComSpec         = ComSpec{verb: 0x3000, w_words: 0,     r_words: 1     ,response: false};
@@ -146,7 +149,8 @@ pub const INT_WLAN_RX_ERROR: u16      = 0b0000_0000_0010_0000;
 pub const INT_INVALID: u16            = 0b1000_0000_0000_0000;
 
 /// Possible link layer connection states
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Debug)]
+#[repr(u16)]
 pub enum LinkState {
     Unknown = 0,
     ResetHold = 1,
@@ -164,7 +168,8 @@ pub enum LinkState {
 /// Note that InitReboot and Rebooting were intentionally omitted. Also, Halted is for
 /// power-up or receiving a DHCPNAK while in Renewing or Rebinding.
 ///
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Debug)]
+#[repr(u16)]
 pub enum DhcpState {
     Halted = 0,
     Init = 1,
@@ -173,4 +178,5 @@ pub enum DhcpState {
     Bound = 4,
     Renewing = 5,
     Rebinding = 6,
+    Invalid = 7,
 }
