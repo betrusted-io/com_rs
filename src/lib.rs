@@ -144,3 +144,33 @@ pub const INT_WLAN_TX_ERROR: u16      = 0b0000_0000_0001_0000;
 pub const INT_WLAN_RX_ERROR: u16      = 0b0000_0000_0010_0000;
 // reserve one code for internal error handling
 pub const INT_INVALID: u16            = 0b1000_0000_0000_0000;
+
+/// Possible link layer connection states
+#[derive(Copy, Clone, PartialEq)]
+pub enum LinkState {
+    Unknown = 0,
+    ResetHold = 1,
+    Uninitialized = 2,
+    Initializing = 3,
+    Disconnected = 4,
+    Connecting = 5,
+    Connected = 6,
+    WFXError = 7,
+}
+
+
+/// DHCP Client States
+///
+/// Note that InitReboot and Rebooting were intentionally omitted. Also, Halted is for
+/// power-up or receiving a DHCPNAK while in Renewing or Rebinding.
+///
+#[derive(Copy, Clone, PartialEq)]
+pub enum DhcpState {
+    Halted = 0,
+    Init = 1,
+    Selecting = 2,
+    Requesting = 3,
+    Bound = 4,
+    Renewing = 5,
+    Rebinding = 6,
+}
