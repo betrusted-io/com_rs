@@ -48,8 +48,8 @@ impl ComState {
     pub const WLAN_GET_IPV4_CONF: ComSpec    = ComSpec{verb: 0x2307, w_words: 0,     r_words: 14    ,response: false};
     pub const WLAN_GET_ERRCOUNTS: ComSpec    = ComSpec{verb: 0x2308, w_words: 0,     r_words: 4     ,response: false};
     // binary status reports the following:
-    // rssi interface_status dhcp_state ipv4_address ssid
-    pub const WLAN_BIN_STATUS: ComSpec       = ComSpec{verb: 0x2309, w_words: 0,     r_words: 4     ,response: false};
+    // rssi(1), interface_status(1), dhcp_state(1), ipv4_address(14), ssid(17)
+    pub const WLAN_BIN_STATUS: ComSpec       = ComSpec{verb: 0x2309, w_words: 0,     r_words: 3+14+17 ,response: false};
 
     // flash commands
     pub const FLASH_WAITACK: ComSpec         = ComSpec{verb: 0x3000, w_words: 0,     r_words: 1     ,response: false};
