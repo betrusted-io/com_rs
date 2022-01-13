@@ -22,7 +22,8 @@ pub struct ComState;
 impl ComState {
     // wifi-related
     pub const SSID_CHECK: ComSpec            = ComSpec{verb: 0x2000, w_words: 0,     r_words: 1     ,response: false};
-    pub const SSID_FETCH: ComSpec            = ComSpec{verb: 0x2100, w_words: 0,     r_words: 16*6  ,response: false};
+    pub const SSID_FETCH: ComSpec            = ComSpec{verb: 0x2100, w_words: 0,     r_words: 16*6  ,response: false}; // legacy, not implemented in newer revs
+    pub const SSID_FETCH_STR: ComSpec        = ComSpec{verb: 0x2100, w_words: 0,     r_words: 34*8  ,response: false}; // legacy, not implemented in newer revs
     pub const WFX_PDS_LINE_SET: ComSpec      = ComSpec{verb: 0x2200, w_words: 129,   r_words: 0     ,response: false}; // 1 length + 128 buffer. length is in *bytes* not words. Sends one line of a PDS.
     pub const WFX_RXSTAT_GET: ComSpec        = ComSpec{verb: 0x2201, w_words: 0,     r_words: 376/2 ,response: false};
     pub const WFX_FW_REV_GET: ComSpec        = ComSpec{verb: 0x2202, w_words: 0,     r_words: 3     ,response: false};
