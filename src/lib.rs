@@ -30,6 +30,8 @@ impl ComState {
     pub const WF200_RESET: ComSpec           = ComSpec{verb: 0x2203, w_words: 1,     r_words: 0     ,response: false};
     pub const SSID_SCAN_ON: ComSpec          = ComSpec{verb: 0x2204, w_words: 0,     r_words: 0     ,response: false};
     pub const SSID_SCAN_OFF: ComSpec         = ComSpec{verb: 0x2205, w_words: 0,     r_words: 0     ,response: false};
+    // config(2) - control - alloc_fail(2) - alloc_oversize(2) - alloc_count
+    pub const WF200_DEBUG: ComSpec           = ComSpec{verb: 0x2206, w_words: 0,     r_words: 8     ,response: false};
 
     // WLAN_*
     // - SSID & PASS fields are sized to match requirements of the WF200 fullMAC driver API.
