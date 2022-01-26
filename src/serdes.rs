@@ -154,16 +154,7 @@ impl Ipv4Conf {
         ret
     }
     pub fn decode_u16(data: &[u16; ComState::WLAN_GET_IPV4_CONF.r_words as usize]) -> Self {
-        let dhcp = match data[0] {
-            0 => DhcpState::Halted,
-            1 => DhcpState::Init,
-            2 => DhcpState::Selecting,
-            3 => DhcpState::Requesting,
-            4 => DhcpState::Bound,
-            5 => DhcpState::Renewing,
-            6 => DhcpState::Rebinding,
-            _ => DhcpState::Invalid,
-        };
+        let dhcp = DhcpState::decode_u16(data[0]);
         Ipv4Conf {
             dhcp,
             mac: [

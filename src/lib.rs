@@ -205,6 +205,20 @@ pub enum DhcpState {
     Rebinding = 6,
     Invalid = 7,
 }
+impl DhcpState {
+    pub fn decode_u16(state: u16) -> Self {
+        match state {
+            0 => DhcpState::Halted,
+            1 => DhcpState::Init,
+            2 => DhcpState::Selecting,
+            3 => DhcpState::Requesting,
+            4 => DhcpState::Bound,
+            5 => DhcpState::Renewing,
+            6 => DhcpState::Rebinding,
+            _ => DhcpState::Invalid,
+        }
+    }
+}
 
 /// Possible connection results
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
