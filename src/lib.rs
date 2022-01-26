@@ -147,6 +147,10 @@ pub const INT_BATTERY_CRITICAL: u16   = 0b0000_0000_0000_1000;
 pub const INT_WLAN_TX_ERROR: u16      = 0b0000_0000_0001_0000;
 // set if there's an error receiving a packet
 pub const INT_WLAN_RX_ERROR: u16      = 0b0000_0000_0010_0000;
+// set if there's a disconnect event happened
+pub const INT_WLAN_DISCONNECT: u16    = 0b0000_0000_0100_0000;
+// set when a connection attempt finishes. must read the status code for the exact result.
+pub const INT_WLAN_CONNECT_EVENT: u16 = 0b0000_0000_1000_0000;
 // reserve one code for internal error handling
 pub const INT_INVALID: u16            = 0b1000_0000_0000_0000;
 
@@ -195,4 +199,32 @@ pub enum DhcpState {
     Renewing = 5,
     Rebinding = 6,
     Invalid = 7,
+}
+
+/// Possible connection results
+#[derive(Copy, Clone, PartialEq, Eq, Debug)]
+#[repr(u16)]
+pub enum ConnectResult {
+    Success = 0,
+    NoMatchingAp = 1,
+    Aborted = 7,
+    Timeout = 2,
+    Reject = 3,
+    AuthFail = 4,
+    Error = 5,
+    Pending = 6,
+}
+impl ConnectResult {
+    pub fn decode_u16(state: u16) -> Self {
+        match state {
+            0 => ConnectResult::Success,
+            1 => ConnectResult::NoMatchingAp,
+            2 => ConnectResult::Timeout,
+            3 => ConnectResult::Reject,
+            4 => ConnectResult::AuthFail,
+            5 => ConnectResult::Error,
+            7 => ConnectResult::Aborted,
+            _ => ConnectResult::Pending,
+        }
+    }
 }
