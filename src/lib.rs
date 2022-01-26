@@ -53,6 +53,8 @@ impl ComState {
     // rssi(1), interface_status(1), ipv4_state(14), ssid(17)
     pub const WLAN_BIN_STATUS: ComSpec       = ComSpec{verb: 0x2309, w_words: 0,     r_words: 2+14+17 ,response: false};
     pub const WLAN_GET_RSSI: ComSpec         = ComSpec{verb: 0x230A, w_words: 0,     r_words: 1     ,response: false};
+    // use on resume to sync up the state with the COM. Returns linkstate then dhcpstate
+    pub const WLAN_SYNC_STATE: ComSpec       = ComSpec{verb: 0x230B, w_words: 0,     r_words: 2     ,response: false};
 
     // flash commands
     pub const FLASH_WAITACK: ComSpec         = ComSpec{verb: 0x3000, w_words: 0,     r_words: 1     ,response: false};
