@@ -151,6 +151,8 @@ pub const INT_WLAN_RX_ERROR: u16      = 0b0000_0000_0010_0000;
 pub const INT_WLAN_DISCONNECT: u16    = 0b0000_0000_0100_0000;
 // set when a connection attempt finishes. must read the status code for the exact result.
 pub const INT_WLAN_CONNECT_EVENT: u16 = 0b0000_0000_1000_0000;
+// set when SSID scan has new data.
+pub const INT_WLAN_SSID_FINISHED: u16 = 0b0000_0001_0000_0100;
 // reserve one code for internal error handling
 pub const INT_INVALID: u16            = 0b1000_0000_0000_0000;
 
