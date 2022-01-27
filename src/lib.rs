@@ -156,6 +156,8 @@ pub const INT_WLAN_DISCONNECT: u16    = 0b0000_0000_0100_0000;
 pub const INT_WLAN_CONNECT_EVENT: u16 = 0b0000_0000_1000_0000;
 // set when SSID scan has new data.
 pub const INT_WLAN_SSID_FINISHED: u16 = 0b0000_0001_0000_0000;
+// set when the WFX chip throws a HIF error
+pub const INT_WLAN_WFX_ERR: u16       = 0b0000_0010_0000_0000;
 // reserve one code for internal error handling
 pub const INT_INVALID: u16            = 0b1000_0000_0000_0000;
 
