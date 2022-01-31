@@ -70,6 +70,7 @@ impl ComState {
     pub const UPTIME: ComSpec                = ComSpec{verb: 0x4002, w_words: 0,     r_words: 4     ,response: false};
     pub const TRNG_SEED: ComSpec             = ComSpec{verb: 0x4003, w_words: 8,     r_words: 0     ,response: false};
     pub const EC_SW_TAG: ComSpec             = ComSpec{verb: 0x4004, w_words: 0,     r_words: 16    ,response: false};
+    pub const LINK_PING: ComSpec             = ComSpec{verb: 0x4005, w_words: 1,     r_words: 2     , response: false};
 
     // charger "dangerous" commands
     pub const CHG_START: ComSpec             = ComSpec{verb: 0x5A00, w_words: 0,     r_words: 0     ,response: false};
