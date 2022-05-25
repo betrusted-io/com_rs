@@ -18,7 +18,7 @@ pub struct ComSpec {
 
 #[non_exhaustive]
 pub struct ComState;
-
+#[rustfmt::skip]
 impl ComState {
     // wifi-related
     pub const SSID_CHECK: ComSpec            = ComSpec{verb: 0x2000, w_words: 0,     r_words: 1     ,response: false};
