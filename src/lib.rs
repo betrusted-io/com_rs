@@ -14,6 +14,11 @@ pub struct ComSpec {
     pub r_words: u16,
     /// specifies if this "verb" is a response code, or a verb
     pub response: bool,
+    /// specifies the min API level for the command, coded as [maj, min, rev, extra]
+    /// [0, 9, 5, 0] is the initial public release version of Xous, so it forms the baseline
+    /// This field is used exclusively by the SoC to determine which commands are safe
+    /// to use with the current EC rev.
+    pub apilevel: [u8; 4],
 }
 
 #[non_exhaustive]
@@ -21,17 +26,17 @@ pub struct ComState;
 #[rustfmt::skip]
 impl ComState {
     // wifi-related
-    pub const SSID_CHECK: ComSpec            = ComSpec{verb: 0x2000, w_words: 0,     r_words: 1     ,response: false};
-    pub const SSID_FETCH: ComSpec            = ComSpec{verb: 0x2100, w_words: 0,     r_words: 16*6  ,response: false}; // legacy, not implemented in newer revs
-    pub const SSID_FETCH_STR: ComSpec        = ComSpec{verb: 0x2101, w_words: 0,     r_words: 34*8  ,response: false}; // legacy, not implemented in newer revs
-    pub const WFX_PDS_LINE_SET: ComSpec      = ComSpec{verb: 0x2200, w_words: 129,   r_words: 0     ,response: false}; // 1 length + 128 buffer. length is in *bytes* not words. Sends one line of a PDS.
-    pub const WFX_RXSTAT_GET: ComSpec        = ComSpec{verb: 0x2201, w_words: 0,     r_words: 376/2 ,response: false};
-    pub const WFX_FW_REV_GET: ComSpec        = ComSpec{verb: 0x2202, w_words: 0,     r_words: 3     ,response: false};
-    pub const WF200_RESET: ComSpec           = ComSpec{verb: 0x2203, w_words: 1,     r_words: 0     ,response: false};
-    pub const SSID_SCAN_ON: ComSpec          = ComSpec{verb: 0x2204, w_words: 0,     r_words: 0     ,response: false};
-    pub const SSID_SCAN_OFF: ComSpec         = ComSpec{verb: 0x2205, w_words: 0,     r_words: 0     ,response: false};
+    pub const SSID_CHECK: ComSpec            = ComSpec{verb: 0x2000, w_words: 0,     r_words: 1     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const SSID_FETCH: ComSpec            = ComSpec{verb: 0x2100, w_words: 0,     r_words: 16*6  ,response: false, apilevel: [0, 9, 5, 0]}; // legacy, not implemented in newer revs
+    pub const SSID_FETCH_STR: ComSpec        = ComSpec{verb: 0x2101, w_words: 0,     r_words: 34*8  ,response: false, apilevel: [0, 9, 5, 0]}; // legacy, not implemented in newer revs
+    pub const WFX_PDS_LINE_SET: ComSpec      = ComSpec{verb: 0x2200, w_words: 129,   r_words: 0     ,response: false, apilevel: [0, 9, 5, 0]}; // 1 length + 128 buffer. length is in *bytes* not words. Sends one line of a PDS.
+    pub const WFX_RXSTAT_GET: ComSpec        = ComSpec{verb: 0x2201, w_words: 0,     r_words: 376/2 ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const WFX_FW_REV_GET: ComSpec        = ComSpec{verb: 0x2202, w_words: 0,     r_words: 3     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const WF200_RESET: ComSpec           = ComSpec{verb: 0x2203, w_words: 1,     r_words: 0     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const SSID_SCAN_ON: ComSpec          = ComSpec{verb: 0x2204, w_words: 0,     r_words: 0     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const SSID_SCAN_OFF: ComSpec         = ComSpec{verb: 0x2205, w_words: 0,     r_words: 0     ,response: false, apilevel: [0, 9, 5, 0]};
     // config(2) - control - alloc_fail(2) - alloc_oversize(2) - alloc_count
-    pub const WF200_DEBUG: ComSpec           = ComSpec{verb: 0x2206, w_words: 0,     r_words: 8     ,response: false};
+    pub const WF200_DEBUG: ComSpec           = ComSpec{verb: 0x2206, w_words: 0,     r_words: 8     ,response: false, apilevel: [0, 9, 6, 0]};
 
     // WLAN_*
     // - SSID & PASS fields are sized to match requirements of the WF200 fullMAC driver API.
@@ -40,72 +45,72 @@ impl ComState {
     // - PASS:   2 bytes length + 64 bytes data = 66 bytes --> 33 words
     // - STATUS: 2 bytes length + 64 bytes data = 66 bytes --> 33 words
     // - IPV4_CONF: serialized binary data according to serdes::Ipv4Conf -> 14 words
-    pub const WLAN_ON: ComSpec               = ComSpec{verb: 0x2300, w_words: 0,     r_words: 0     ,response: false};
-    pub const WLAN_OFF: ComSpec              = ComSpec{verb: 0x2301, w_words: 0,     r_words: 0     ,response: false};
-    pub const WLAN_SET_SSID: ComSpec         = ComSpec{verb: 0x2302, w_words: 17,    r_words: 0     ,response: false};
-    pub const WLAN_SET_PASS: ComSpec         = ComSpec{verb: 0x2303, w_words: 33,    r_words: 0     ,response: false};
-    pub const WLAN_JOIN: ComSpec             = ComSpec{verb: 0x2304, w_words: 0,     r_words: 0     ,response: false};
-    pub const WLAN_LEAVE: ComSpec            = ComSpec{verb: 0x2305, w_words: 0,     r_words: 0     ,response: false};
-    pub const WLAN_STATUS: ComSpec           = ComSpec{verb: 0x2306, w_words: 0,     r_words: 33    ,response: false};
-    pub const WLAN_GET_IPV4_CONF: ComSpec    = ComSpec{verb: 0x2307, w_words: 0,     r_words: 14    ,response: false};
-    pub const WLAN_GET_ERRCOUNTS: ComSpec    = ComSpec{verb: 0x2308, w_words: 0,     r_words: 4     ,response: false};
+    pub const WLAN_ON: ComSpec               = ComSpec{verb: 0x2300, w_words: 0,     r_words: 0     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const WLAN_OFF: ComSpec              = ComSpec{verb: 0x2301, w_words: 0,     r_words: 0     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const WLAN_SET_SSID: ComSpec         = ComSpec{verb: 0x2302, w_words: 17,    r_words: 0     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const WLAN_SET_PASS: ComSpec         = ComSpec{verb: 0x2303, w_words: 33,    r_words: 0     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const WLAN_JOIN: ComSpec             = ComSpec{verb: 0x2304, w_words: 0,     r_words: 0     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const WLAN_LEAVE: ComSpec            = ComSpec{verb: 0x2305, w_words: 0,     r_words: 0     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const WLAN_STATUS: ComSpec           = ComSpec{verb: 0x2306, w_words: 0,     r_words: 33    ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const WLAN_GET_IPV4_CONF: ComSpec    = ComSpec{verb: 0x2307, w_words: 0,     r_words: 14    ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const WLAN_GET_ERRCOUNTS: ComSpec    = ComSpec{verb: 0x2308, w_words: 0,     r_words: 4     ,response: false, apilevel: [0, 9, 5, 0]};
     // binary status reports the following:
     // rssi(1), interface_status(1), ipv4_state(14), ssid(17)
-    pub const WLAN_BIN_STATUS: ComSpec       = ComSpec{verb: 0x2309, w_words: 0,     r_words: 2+14+17 ,response: false};
-    pub const WLAN_GET_RSSI: ComSpec         = ComSpec{verb: 0x230A, w_words: 0,     r_words: 1     ,response: false};
+    pub const WLAN_BIN_STATUS: ComSpec       = ComSpec{verb: 0x2309, w_words: 0,     r_words: 2+14+17 ,response: false, apilevel: [0, 9, 6, 0]};
+    pub const WLAN_GET_RSSI: ComSpec         = ComSpec{verb: 0x230A, w_words: 0,     r_words: 1     ,response: false, apilevel: [0, 9, 5, 0]};
     // use on resume to sync up the state with the COM. Returns linkstate then dhcpstate
-    pub const WLAN_SYNC_STATE: ComSpec       = ComSpec{verb: 0x230B, w_words: 0,     r_words: 2     ,response: false};
+    pub const WLAN_SYNC_STATE: ComSpec       = ComSpec{verb: 0x230B, w_words: 0,     r_words: 2     ,response: false, apilevel: [0, 9, 5, 0]};
 
     // flash commands
-    pub const FLASH_WAITACK: ComSpec         = ComSpec{verb: 0x3000, w_words: 0,     r_words: 1     ,response: false};
-    pub const FLASH_ACK: ComSpec             = ComSpec{verb: 0x3CC3, w_words: 0,     r_words: 0     ,response: true};
-    pub const FLASH_ERASE: ComSpec           = ComSpec{verb: 0x3200, w_words: 4,     r_words: 0     ,response: false};
-    pub const FLASH_PP: ComSpec              = ComSpec{verb: 0x3300, w_words: 130,   r_words: 0     ,response: false};
-    pub const FLASH_LOCK: ComSpec            = ComSpec{verb: 0x3400, w_words: 0,     r_words: 0     ,response: false}; // lock activity for updates
-    pub const FLASH_UNLOCK: ComSpec          = ComSpec{verb: 0x3434, w_words: 0,     r_words: 0     ,response: false}; // unlock activity for updates
-    pub const FLASH_VERIFY: ComSpec          = ComSpec{verb: 0x3500, w_words: 2,     r_words: 128   ,response: false};
+    pub const FLASH_WAITACK: ComSpec         = ComSpec{verb: 0x3000, w_words: 0,     r_words: 1     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const FLASH_ACK: ComSpec             = ComSpec{verb: 0x3CC3, w_words: 0,     r_words: 0     ,response: true,  apilevel: [0, 9, 5, 0]};
+    pub const FLASH_ERASE: ComSpec           = ComSpec{verb: 0x3200, w_words: 4,     r_words: 0     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const FLASH_PP: ComSpec              = ComSpec{verb: 0x3300, w_words: 130,   r_words: 0     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const FLASH_LOCK: ComSpec            = ComSpec{verb: 0x3400, w_words: 0,     r_words: 0     ,response: false, apilevel: [0, 9, 5, 0]}; // lock activity for updates
+    pub const FLASH_UNLOCK: ComSpec          = ComSpec{verb: 0x3434, w_words: 0,     r_words: 0     ,response: false, apilevel: [0, 9, 5, 0]}; // unlock activity for updates
+    pub const FLASH_VERIFY: ComSpec          = ComSpec{verb: 0x3500, w_words: 2,     r_words: 128   ,response: false, apilevel: [0, 9, 8, 8]};
 
     // system meta commands
-    pub const LOOP_TEST: ComSpec             = ComSpec{verb: 0x4000, w_words: 0,     r_words: 1     ,response: false};
-    pub const EC_GIT_REV: ComSpec            = ComSpec{verb: 0x4001, w_words: 0,     r_words: 3     ,response: false};
-    pub const UPTIME: ComSpec                = ComSpec{verb: 0x4002, w_words: 0,     r_words: 4     ,response: false};
-    pub const TRNG_SEED: ComSpec             = ComSpec{verb: 0x4003, w_words: 8,     r_words: 0     ,response: false};
-    pub const EC_SW_TAG: ComSpec             = ComSpec{verb: 0x4004, w_words: 0,     r_words: 16    ,response: false};
-    pub const LINK_PING: ComSpec             = ComSpec{verb: 0x4005, w_words: 1,     r_words: 2     , response: false};
+    pub const LOOP_TEST: ComSpec             = ComSpec{verb: 0x4000, w_words: 0,     r_words: 1     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const EC_GIT_REV: ComSpec            = ComSpec{verb: 0x4001, w_words: 0,     r_words: 3     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const UPTIME: ComSpec                = ComSpec{verb: 0x4002, w_words: 0,     r_words: 4     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const TRNG_SEED: ComSpec             = ComSpec{verb: 0x4003, w_words: 8,     r_words: 0     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const EC_SW_TAG: ComSpec             = ComSpec{verb: 0x4004, w_words: 0,     r_words: 16    ,response: false, apilevel: [0, 9, 6, 0]};
+    pub const LINK_PING: ComSpec             = ComSpec{verb: 0x4005, w_words: 1,     r_words: 2     , response: false, apilevel: [0, 9, 6, 0]};
 
     // charger "dangerous" commands
-    pub const CHG_START: ComSpec             = ComSpec{verb: 0x5A00, w_words: 0,     r_words: 0     ,response: false};
-    pub const CHG_BOOST_ON: ComSpec          = ComSpec{verb: 0x5ABB, w_words: 0,     r_words: 0     ,response: false};
-    pub const CHG_BOOST_OFF: ComSpec         = ComSpec{verb: 0x5AFE, w_words: 0,     r_words: 0     ,response: false};
+    pub const CHG_START: ComSpec             = ComSpec{verb: 0x5A00, w_words: 0,     r_words: 0     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const CHG_BOOST_ON: ComSpec          = ComSpec{verb: 0x5ABB, w_words: 0,     r_words: 0     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const CHG_BOOST_OFF: ComSpec         = ComSpec{verb: 0x5AFE, w_words: 0,     r_words: 0     ,response: false, apilevel: [0, 9, 5, 0]};
 
     // backlight: this is an odd bird: back light is set by directly using the lower 10 bits to code the backlight level
-    pub const BL_START: ComSpec              = ComSpec{verb: 0x6800, w_words: 0,     r_words: 0     ,response: false};
-    pub const BL_END: ComSpec                = ComSpec{verb: 0x6BFF, w_words: 0,     r_words: 0     ,response: false};
+    pub const BL_START: ComSpec              = ComSpec{verb: 0x6800, w_words: 0,     r_words: 0     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const BL_END: ComSpec                = ComSpec{verb: 0x6BFF, w_words: 0,     r_words: 0     ,response: false, apilevel: [0, 9, 5, 0]};
 
     // gas gauge commands
-    pub const GAS_GAUGE: ComSpec             = ComSpec{verb: 0x7000, w_words: 0,     r_words: 4     ,response: false};
-    pub const GG_FACTORY_CAPACITY: ComSpec   = ComSpec{verb: 0x7676, w_words: 1,     r_words: 1     ,response: false};
-    pub const GG_GET_CAPACITY: ComSpec       = ComSpec{verb: 0x7600, w_words: 0,     r_words: 1     ,response: false};
-    pub const GG_DEBUG: ComSpec              = ComSpec{verb: 0x7200, w_words: 0,     r_words: 1     ,response: false};
-    pub const GG_SOC: ComSpec                = ComSpec{verb: 0x7300, w_words: 0,     r_words: 1     ,response: false};
-    pub const GG_REMAINING: ComSpec          = ComSpec{verb: 0x7400, w_words: 0,     r_words: 1     ,response: false};
-    pub const GG_FULL_CAPACITY: ComSpec      = ComSpec{verb: 0x7402, w_words: 0,     r_words: 1,     response: false};
+    pub const GAS_GAUGE: ComSpec             = ComSpec{verb: 0x7000, w_words: 0,     r_words: 4     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const GG_FACTORY_CAPACITY: ComSpec   = ComSpec{verb: 0x7676, w_words: 1,     r_words: 1     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const GG_GET_CAPACITY: ComSpec       = ComSpec{verb: 0x7600, w_words: 0,     r_words: 1     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const GG_DEBUG: ComSpec              = ComSpec{verb: 0x7200, w_words: 0,     r_words: 1     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const GG_SOC: ComSpec                = ComSpec{verb: 0x7300, w_words: 0,     r_words: 1     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const GG_REMAINING: ComSpec          = ComSpec{verb: 0x7400, w_words: 0,     r_words: 1     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const GG_FULL_CAPACITY: ComSpec      = ComSpec{verb: 0x7402, w_words: 0,     r_words: 1,     response: false, apilevel: [0, 9, 5, 0]};
 
     // charger status - non-dangerous charger commands
-    pub const STAT: ComSpec                  = ComSpec{verb: 0x8000, w_words: 0,     r_words: 16    ,response: false};
-    pub const STAT_RETURN: ComSpec           = ComSpec{verb: 0x8001, w_words: 0,     r_words: 0     ,response: true};
+    pub const STAT: ComSpec                  = ComSpec{verb: 0x8000, w_words: 0,     r_words: 16    ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const STAT_RETURN: ComSpec           = ComSpec{verb: 0x8001, w_words: 0,     r_words: 0     ,response: true,  apilevel: [0, 9, 5, 0]};
 
     // power state commands
-    pub const POWER_OFF: ComSpec             = ComSpec{verb: 0x9000, w_words: 0,     r_words: 1     ,response: false};
-    pub const POWER_CHARGER_STATE: ComSpec   = ComSpec{verb: 0x9100, w_words: 0,     r_words: 1     ,response: false};
-    pub const POWER_SHIPMODE: ComSpec        = ComSpec{verb: 0x9200, w_words: 0,     r_words: 0     ,response: false};
+    pub const POWER_OFF: ComSpec             = ComSpec{verb: 0x9000, w_words: 0,     r_words: 1     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const POWER_CHARGER_STATE: ComSpec   = ComSpec{verb: 0x9100, w_words: 0,     r_words: 1     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const POWER_SHIPMODE: ComSpec        = ComSpec{verb: 0x9200, w_words: 0,     r_words: 0     ,response: false, apilevel: [0, 9, 5, 0]};
 
     // gyro commands
-    pub const GYRO_UPDATE: ComSpec           = ComSpec{verb: 0xA000, w_words: 0,     r_words: 0     ,response: false};
-    pub const GYRO_READ: ComSpec             = ComSpec{verb: 0xA100, w_words: 0,     r_words: 4     ,response: false};
+    pub const GYRO_UPDATE: ComSpec           = ComSpec{verb: 0xA000, w_words: 0,     r_words: 0     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const GYRO_READ: ComSpec             = ComSpec{verb: 0xA100, w_words: 0,     r_words: 4     ,response: false, apilevel: [0, 9, 5, 0]};
 
     // USB CC commands
-    pub const POLL_USB_CC: ComSpec           = ComSpec{verb: 0xB000, w_words: 0,     r_words: 5     ,response: false};
+    pub const POLL_USB_CC: ComSpec           = ComSpec{verb: 0xB000, w_words: 0,     r_words: 5     ,response: false, apilevel: [0, 9, 5, 0]};
 
     // encoded length WLAN frames
     // LSB mask of 0x7FF encodes number of *bytes* to fetch or send; in the case that an odd number of bytes are
@@ -113,13 +118,13 @@ impl ComState {
     // note: entries are not comprehensively encoded, just a few examples provided
     // The first word of a "FETCH" frame confirms the number of words to be sent. It should be equal to the LSB of the verb minus 1.
     // "SEND" frames do not encode a confirmation of words to send
-    pub const NET_FRAME_FETCH_0: ComSpec     = ComSpec{verb: 0xC800, w_words: 0,     r_words: 0     ,response: false};
-    pub const NET_FRAME_FETCH_1: ComSpec     = ComSpec{verb: 0xC801, w_words: 0,     r_words: 1     ,response: false};
-    pub const NET_FRAME_FETCH_2: ComSpec     = ComSpec{verb: 0xC802, w_words: 0,     r_words: 2     ,response: false};
-    pub const NET_FRAME_FETCH_7FF: ComSpec   = ComSpec{verb: 0xCFFF, w_words: 0,     r_words: 0x7FF ,response: false};
-    pub const NET_FRAME_SEND_0: ComSpec      = ComSpec{verb: 0xC000, w_words: 0,     r_words: 0     ,response: false};
-    pub const NET_FRAME_SEND_1: ComSpec      = ComSpec{verb: 0xC001, w_words: 1,     r_words: 0     ,response: false};
-    pub const NET_FRAME_SEND_7FF: ComSpec    = ComSpec{verb: 0xC7FF, w_words: 0x7FF, r_words: 0     ,response: false};
+    pub const NET_FRAME_FETCH_0: ComSpec     = ComSpec{verb: 0xC800, w_words: 0,     r_words: 0     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const NET_FRAME_FETCH_1: ComSpec     = ComSpec{verb: 0xC801, w_words: 0,     r_words: 1     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const NET_FRAME_FETCH_2: ComSpec     = ComSpec{verb: 0xC802, w_words: 0,     r_words: 2     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const NET_FRAME_FETCH_7FF: ComSpec   = ComSpec{verb: 0xCFFF, w_words: 0,     r_words: 0x7FF ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const NET_FRAME_SEND_0: ComSpec      = ComSpec{verb: 0xC000, w_words: 0,     r_words: 0     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const NET_FRAME_SEND_1: ComSpec      = ComSpec{verb: 0xC001, w_words: 1,     r_words: 0     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const NET_FRAME_SEND_7FF: ComSpec    = ComSpec{verb: 0xC7FF, w_words: 0x7FF, r_words: 0     ,response: false, apilevel: [0, 9, 5, 0]};
 
     // protocol overhead commands
     // - GET_INTERRUPT: 1 word interrupt source, 1 word rx len argument *in bytes* (always returned) -> 2 words
@@ -127,15 +132,15 @@ impl ComState {
     // - GET_INTMASK: 1 read word for the current interrupt bitmask
     // - ACK_INTERRUPT: 1 word for acknowledging interrupts. All bits set in the ACK will set the GET_INTERRUPT bit to 0.
     //   note that also calling a verb that handles an interrupt will implicitly acknowledge and clear the interrupt source
-    pub const LINK_READ: ComSpec             = ComSpec{verb: 0xF0F0, w_words: 0,     r_words: 0     ,response: false}; // dummy command to "pump" the bus to read data
-    pub const LINK_SYNC: ComSpec             = ComSpec{verb: 0xFFFF, w_words: 0,     r_words: 0     ,response: false};
-    pub const LINK_GET_INTERRUPT: ComSpec    = ComSpec{verb: 0xF108, w_words: 0,     r_words: 2     ,response: false};
-    pub const LINK_SET_INTMASK: ComSpec      = ComSpec{verb: 0xF109, w_words: 1,     r_words: 0     ,response: false};
-    pub const LINK_GET_INTMASK: ComSpec      = ComSpec{verb: 0xF10A, w_words: 0,     r_words: 1     ,response: false};
-    pub const LINK_ACK_INTERRUPT: ComSpec    = ComSpec{verb: 0xF10B, w_words: 1,     r_words: 0     ,response: false};
+    pub const LINK_READ: ComSpec             = ComSpec{verb: 0xF0F0, w_words: 0,     r_words: 0     ,response: false, apilevel: [0, 9, 5, 0]}; // dummy command to "pump" the bus to read data
+    pub const LINK_SYNC: ComSpec             = ComSpec{verb: 0xFFFF, w_words: 0,     r_words: 0     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const LINK_GET_INTERRUPT: ComSpec    = ComSpec{verb: 0xF108, w_words: 0,     r_words: 2     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const LINK_SET_INTMASK: ComSpec      = ComSpec{verb: 0xF109, w_words: 1,     r_words: 0     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const LINK_GET_INTMASK: ComSpec      = ComSpec{verb: 0xF10A, w_words: 0,     r_words: 1     ,response: false, apilevel: [0, 9, 5, 0]};
+    pub const LINK_ACK_INTERRUPT: ComSpec    = ComSpec{verb: 0xF10B, w_words: 1,     r_words: 0     ,response: false, apilevel: [0, 9, 5, 0]};
 
     // catch-all error code
-    pub const ERROR: ComSpec                 = ComSpec{verb: 0xDEAD, w_words: 0,     r_words: 0     ,response: true};
+    pub const ERROR: ComSpec                 = ComSpec{verb: 0xDEAD, w_words: 0,     r_words: 0     ,response: true, apilevel: [0, 9, 5, 0]};
 }
 
 
