@@ -63,6 +63,7 @@ impl ComState {
     pub const FLASH_PP: ComSpec              = ComSpec{verb: 0x3300, w_words: 130,   r_words: 0     ,response: false};
     pub const FLASH_LOCK: ComSpec            = ComSpec{verb: 0x3400, w_words: 0,     r_words: 0     ,response: false}; // lock activity for updates
     pub const FLASH_UNLOCK: ComSpec          = ComSpec{verb: 0x3434, w_words: 0,     r_words: 0     ,response: false}; // unlock activity for updates
+    pub const FLASH_VERIFY: ComSpec          = ComSpec{verb: 0x3500, w_words: 2,     r_words: 128   ,response: false};
 
     // system meta commands
     pub const LOOP_TEST: ComSpec             = ComSpec{verb: 0x4000, w_words: 0,     r_words: 1     ,response: false};
